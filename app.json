@@ -10,6 +10,12 @@
       "expo-router"
     ],
     "name": "thoughts-journal",
-    "slug": "thoughts-journal"
+    "slug": "thoughts-journal",
+    "android": {
+      "package": "com.anonymous.thoughtsjournal"
+    },
+    "ios": {
+      "bundleIdentifier": "com.anonymous.thoughtsjournal"
+    }
   }
 }

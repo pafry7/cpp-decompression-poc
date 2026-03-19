@@ -11,7 +11,7 @@ export const useSupabase = () => React.useContext(SupabaseContext);
 export const powerSync = new PowerSyncDatabase({
     schema: AppSchema,
     database: new OPSqliteOpenFactory({
-        dbFilename: 'app.db'
+        dbFilename: 'app2.db'
     }),
 });
 
@@ -21,37 +21,11 @@ const logger = createBaseLogger();
 logger.useDefaults();
 logger.setLevel(LogLevel.DEBUG);
 
-async function createTables() {
-    await powerSync.execute(`
-        CREATE TABLE IF NOT EXISTS thoughts (
-            id TEXT NOT NULL PRIMARY KEY,
-            content TEXT,
-            created_at TEXT,
-            created_by TEXT
-        ) STRICT;
-    `);
-
-    await powerSync.execute(`
-        CREATE TABLE IF NOT EXISTS reactions (
-            id TEXT NOT NULL PRIMARY KEY,
-            thought_id TEXT,
-            user_id TEXT,
-            emoji TEXT,
-            created_at TEXT
-        ) STRICT;
-    `);
-
-    await powerSync.execute(`
-        CREATE INDEX IF NOT EXISTS idx_reactions_thought ON reactions(thought_id);
-    `);
-}
-
 export const SystemProvider = ({ children }: PropsWithChildren) => {
     const [initialized, setInitialized] = useState(false);
 
     useEffect(() => {
         async function init() {
-            await createTables();
             await powerSync.connect(connector, {clientImplementation: SyncClientImplementation.RUST});
 
             // Debug: log sync status

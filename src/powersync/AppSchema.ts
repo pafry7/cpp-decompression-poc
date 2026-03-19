@@ -1,56 +1,36 @@
-import { Schema } from "@powersync/react-native";
+import { column, Schema, Table } from "@powersync/react-native";
 
-// const thoughts = new Table({
-//   content: column.text,
-//   created_at: column.text,  created_by: column.text,
-// });
-
-// const reactions = new Table(
-//   {
-//     thought_id: column.text,
-//     user_id: column.text,
-//     emoji: column.text,
-//     created_at: column.text,
-//   },
-//   { indexes: { thought: ["thought_id"] } }
-// );
-
-export const AppSchema = new Schema({
-
-})
-AppSchema.withRawTables({
-  thoughts: {
-    put: {
-      sql: "INSERT OR REPLACE INTO thoughts (id, content, created_at, created_by) VALUES (?, ?, ?, ?)",
-      params: [
-        "Id",
-        { Column: "content" },
-        { Column: "created_at" },
-        { Column: "created_by" },
-      ],
-    },
-    delete: {
-      sql: "DELETE FROM thoughts WHERE id = ?",
-      params: ["Id"],
-    },
-  },
-  reactions: {
-    put: {
-      sql: "INSERT OR REPLACE INTO reactions (id, thought_id, user_id, emoji, created_at) VALUES (?, ?, ?, ?, ?)",
-      params: [
-        "Id",
-        { Column: "thought_id" },
-        { Column: "user_id" },
-        { Column: "emoji" },
-        { Column: "created_at" },
-      ],
-    },
-    delete: {
-      sql: "DELETE FROM reactions WHERE id = ?",
-      params: ["Id"],
-    },
-  },
+const thoughts = new Table({
+  content: column.text,
+  created_at: column.text,
+  created_by: column.text,
 });
+
+const reactions = new Table(
+  {
+    thought_id: column.text,
+    user_id: column.text,
+    emoji: column.text,
+    created_at: column.text,
+  },
+  { indexes: { thought: ["thought_id"] } }
+);
+
+const dead_letter = new Table(
+  {
+    target_table: column.text,
+    row_id: column.text,
+    op_type: column.text,
+    op_data: column.text,
+    error_message: column.text,
+    retry_count: column.integer,
+    original_client_id: column.integer,
+    created_at: column.text,
+  },
+  { localOnly: true }
+);
+
+export const AppSchema = new Schema({ thoughts, reactions, dead_letter });
 
 export type ThoughtRecord = {
   id: string;
@@ -64,5 +44,17 @@ export type ReactionRecord = {
   thought_id: string;
   user_id: string;
   emoji: string;
+  created_at: string;
+};
+
+export type DeadLetterRecord = {
+  id: string;
+  target_table: string;
+  row_id: string;
+  op_type: string;
+  op_data: string;
+  error_message: string;
+  retry_count: number;
+  original_client_id: number;
   created_at: string;
 };
